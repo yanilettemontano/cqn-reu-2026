@@ -6,14 +6,14 @@ using ConcurrentSim
 
 #-------Network Setup-------------
 #setting the topology
-function gridTopology(
+function simulation_setup(
     graph,
     regSize::Int;
     T2 = 100.0,
     representation = QuantumOpticsRepr,
     endNodes = nothing,
     EndNodeControllerType = EndNodeController,
-    classicalDelay = 1e-3
+    classical_delay = 1e-3
 )
 
 #creates the registers for each node
@@ -26,7 +26,7 @@ for _ in vertices(graph)
 end
 
 #Build the network and get the simulation scheduler
-net = RegisterNet(graph, registers; classicalDelay)
+net = RegisterNet(graph, registers; classical_delay)
 sim = get_time_tracker(net)
 
 #default: all nodes can be end nodes
