@@ -21,17 +21,28 @@ variance_thres_default = 0.001  #max acceptable fidelity variance
 α_min_default = 1e-7            #safety floor
 α_max_default = 1e-3            #safety ceiling
 
-#---PI Controller Data Structure---
 mutable struct PIController
-    0.0                     #current marking probability(starts at 0.0)
-    0.0                     #buffering time from last update step
-    α_default               #adaptive proportional gain
-    β_default               #adaptive integral gain (always < alpha)
-    t_target_default        #target buffering time
-    Float64[]               #list of recent delivery fidelity values 
-    0.0                     #sim values of the last PI update
+    p::Float64                          # current marking probability
+    t_prev::Float64                     # buffering time from last step
+    α::Float64                          # proportional gain
+    β::Float64                          # integral gain (always < alpha)
+    t_target::Float64                   # target buffering time
+    fidelity_history::Vector{Float64}   # recent delivered fidelity values
+    last_update_time::Float64           # sim time of last PI update
 end
 
+# convenience constructor with defaults
+function PIController()
+    PIController(
+        0.0,                  # p starts at 0
+        0.0,                  # t_prev starts at 0
+        α_default,
+        β_default,
+        t_target_default,
+        Float64[],            # empty fidelity history
+        0.0                   # last update time
+    )
+end
 ##
 #using proportional and integral components to periodically update the probability pᵢ → pᵢ₊₁
 #between time steps i and i + 1
@@ -52,8 +63,8 @@ end
 
 #---Buffering time measurement ---
 #Compute the average time qdatagrams have been waiting at this switch node
-function avg_buffering_time(arrival_times, current_time)
-    isempty(arrival_time) && return 0.0 
+function avg_buffering_time(arrival_times::Dict, current_time::Float64)
+    isempty(arrival_times) && return 0.0 
 
     total_wait = 0.0
     for arrival_time in values(arrival_times)
