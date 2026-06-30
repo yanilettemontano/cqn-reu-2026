@@ -1,4 +1,5 @@
 using Statistics
+using Random
 
 """
 difference equation to update the marking/drop probability (p)
@@ -72,4 +73,14 @@ function avg_buffering_time(arrival_times::Dict, current_time::Float64)
     end
     num_entries = length(arrival_times)
     return total_wait/num_entries
+end
+
+##
+#Decide whether to mark an arriving datagram as congested
+#Called every time a QDatagram, arrives at this switch
+function should_mark(ctrl::PIController)
+random_value = rand()
+
+return random_value < ctrl.p
+
 end

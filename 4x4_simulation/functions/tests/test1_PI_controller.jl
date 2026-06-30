@@ -1,4 +1,4 @@
-include("pi_controller.jl")
+include(joinpath(@__DIR__, "..", "..", "PI_controller.jl"))
 
 ctrl = PIController()
 println("Initial p: ", ctrl.p)          # should be 0.0
