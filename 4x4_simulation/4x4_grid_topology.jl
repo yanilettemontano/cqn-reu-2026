@@ -23,7 +23,8 @@ put!(net[1], flow1)
 flow2 = Flow(src=numNodes - numCols + 1, dst=numNodes, npairs = 5, uuid = 2)
 put!(net[numNodes - numCols + 1], flow2)
 #flow 3: top-left(1) → bottom-left
-#flow3 = Flow(src=1, dst=numNodes - numCols + 1, npairs = 5, uuid = 3)
+flow3 = Flow(src=1, dst=numNodes - numCols + 1, npairs = 5, uuid = 3)
+put!(net[1], flow3)
 
 run(sim, 100.0)
 
@@ -45,8 +46,8 @@ flow1_src = count_tags!(mb1, QTCPPairBegin)
 flow1_dst = count_tags!(mb4, QTCPPairEnd)
 flow2_src = count_tags!(mb13, QTCPPairBegin)
 flow2_dst = count_tags!(mb16, QTCPPairEnd)
-#flow3_src = count_tags!(mb1, QTCPPairBegin)
-#flow3_dst = count_tags!(mb13, QTCPPairEnd)
+flow3_src = count_tags!(mb1, QTCPPairBegin)
+flow3_dst = count_tags!(mb13, QTCPPairEnd)
 
 #----Test to see the grid topology----
 

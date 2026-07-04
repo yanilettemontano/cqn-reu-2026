@@ -84,3 +84,63 @@ random_value = rand()
 return random_value < ctrl.p
 
 end
+
+##
+#---Fidelity Tracking ---
+function record_fidelity!(ctrl::PIController, fidelity::Float64)
+"""
+Record the fidelity of a delivered bell pair 
+Called from EndNodeController whne QTCPPairEnd arrives
+Keeps only the last N = 20 values to track recent performance
+"""
+#append fidelity_value to controller fidelity_history
+    push!(ctrl.fidelity_history, fidelity)
+    #keep only the last 20 values
+    if length(ctrl.fidelity_history) > 20
+        popfirst!(ctrl.fidelity_history)
+    end
+end
+
+##
+#---Adaptive Gain Tuning ---
+function adapt_gains!(ctrl::PIController, flow_count::Int)
+"""
+Adaptively tune alpha and beta based on observed network state
+Called periodically -- less often than pi_update
+Suggested Interval: every 10 seconds of sim time
+Inputs:
+    controller - the PIController struct
+    flow_count - number of active flows at this node right now
+
+The three adaptive signals are:
+1. fidelity below target: increase alpha and beta to react faster
+2. fidelity variance too high: decrease alpha and beta to stabilize
+3. flow count scaling: more flows = more competition = tighter control needed
+→ scale alpha proportionally with active flow count
+"""
+fidelity_history = ctrl.fidelity_history
+
+if fidelity_history < 5
+    return              #not enough data to adapt gains so keep current gain values
+end
+
+#Signal 1: fidelity below target
+avg_fidelity = mean(fidelity_history)
+if avg_fidelity < fidelty_target_default
+    ctrl.α *= 1.1      #increase alpha by 10%
+
+#Signal 2: fidelity variance too high
+fidelity_variance = var(fidelity_history)
+elseif fidelity_variance > variance_thres_default
+    ctrl.α *= 0.9      #decrease alpha by 10%
+end
+#Signal 3: flow count scaling
+ctrl.α *= 1 + 0.1 * flow_count  #increase alpha by 10% for each active flow
+
+#maintain alpha > beta > 0 (for PI stability)
+ctrl.β = ctrl.α * 0.99  #keep beta slightly less than alpha
+
+#clamp to safe operating range
+ctrl.α = clamp(ctrl.α, α_min_default, α_max_default)
+ctrl.β = clamp(ctrl.β, α_min_default * 0.99, ctrl.α * 0.99)  #beta slightly less than alpha
+end
