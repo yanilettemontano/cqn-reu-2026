@@ -17,7 +17,7 @@ q_old, p_old: state variables from previous samples
 β_default = 1.816e-5            #integral gain (always < alpha)
 t_target_default = 0.5e-3       #target buffering time
 update_interval_default = 0.1   #how often PI runs
-fidelty_target_default = 0.88   #fidelty maintanance
+fidelity_target_default = 0.88   #fidelty maintanance
 variance_thres_default = 0.001  #max acceptable fidelity variance
 α_min_default = 1e-7            #safety floor
 α_max_default = 1e-3            #safety ceiling
@@ -87,12 +87,12 @@ end
 
 ##
 #---Fidelity Tracking ---
-function record_fidelity!(ctrl::PIController, fidelity::Float64)
 """
 Record the fidelity of a delivered bell pair 
 Called from EndNodeController whne QTCPPairEnd arrives
 Keeps only the last N = 20 values to track recent performance
 """
+function record_fidelity!(ctrl::PIController, fidelity::Float64)
 #append fidelity_value to controller fidelity_history
     push!(ctrl.fidelity_history, fidelity)
     #keep only the last 20 values
@@ -103,7 +103,6 @@ end
 
 ##
 #---Adaptive Gain Tuning ---
-function adapt_gains!(ctrl::PIController, flow_count::Int)
 """
 Adaptively tune alpha and beta based on observed network state
 Called periodically -- less often than pi_update
@@ -118,19 +117,20 @@ The three adaptive signals are:
 3. flow count scaling: more flows = more competition = tighter control needed
 → scale alpha proportionally with active flow count
 """
+function adapt_gains!(ctrl::PIController, flow_count::Int)
 fidelity_history = ctrl.fidelity_history
 
-if fidelity_history < 5
+if length(fidelity_history) < 5
     return              #not enough data to adapt gains so keep current gain values
 end
 
 #Signal 1: fidelity below target
-avg_fidelity = mean(fidelity_history)
-if avg_fidelity < fidelty_target_default
+avg_fidelity = mean(ctrl.fidelity_history)
+fidelity_variance = var(ctrl.fidelity_history)
+if avg_fidelity < fidelity_target_default
     ctrl.α *= 1.1      #increase alpha by 10%
 
 #Signal 2: fidelity variance too high
-fidelity_variance = var(fidelity_history)
 elseif fidelity_variance > variance_thres_default
     ctrl.α *= 0.9      #decrease alpha by 10%
 end

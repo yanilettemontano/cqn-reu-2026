@@ -11,7 +11,7 @@ sim,net = simulation_setup(graph, 20; T2=100.0, endNodes=endNodes)
 flow1 = Flow(src=1, dst=3, npairs=5, uuid=1)
 put!(net[1], flow1)
 
-run(sim, 100.0)
+run(sim, 5.0)
 
 function count_tags!(mb, tag_type)
     n = 0
