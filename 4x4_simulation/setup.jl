@@ -1,6 +1,6 @@
 using QuantumSavory 
 using QuantumSavory.ProtocolZoo
-using Graphs
+using Graphs: grid
 using ResumableFunctions
 using ConcurrentSim
 
@@ -13,7 +13,7 @@ function simulation_setup(
     representation = QuantumOpticsRepr,
     endNodes = nothing,
     EndNodeControllerType = EndNodeController,
-    classical_delay = 1e-3
+    classical_delay = 1e-3,
 )
 
 #creates the registers for each node
