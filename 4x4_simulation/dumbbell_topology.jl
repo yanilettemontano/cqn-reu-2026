@@ -97,27 +97,19 @@ for(i, src, dst, flow) in[
 end
 
 #--- fidelity summary ---
-records = Vector{Tuple{Float64, Int, Float64}}()
-open("dumbbell_log.txt") do f
-    for line in eachline(f)
-        if occursin("FIDELITY RECORD", line)
-            m = match(r"\[([0-9.]+)\].*flow=(\d+)\..*F=([0-9.]+)", line)
-            if !isnothing(m)
-                push!(records, (parse(Float64, m[1]),
-                                parse(Int,     m[2]),
-                                parse(Float64, m[3])))
+records = let
+    recs = Vector{Tuple{Float64, Int, Float64}}()
+    open("dumbbell_log.txt") do f
+        for line in eachline(f)
+            if occursin("FIDELITY RECORD", line)
+                m = match(r"\[([0-9.]+)\].*flow=(\d+)\..*F=([0-9.]+)", line)
+                if !isnothing(m)
+                    push!(recs, (parse(Float64, m[1]),
+                                 parse(Int,     m[2]),
+                                 parse(Float64, m[3])))
+                end
             end
         end
     end
-end
-
-if !isempty(records)
-    println("\nFidelity summary (dumbbell, 3 flows):")
-    for fid in 1:3
-        vals = [r[3] for r in records if r[2] == fid]
-        if !isempty(vals)
-            println("  Flow $fid: mean=$(round(mean(vals), digits=4)) " *
-                    "min=$(round(minimum(vals), digits=4))")
-        end
-    end
+    recs
 end
