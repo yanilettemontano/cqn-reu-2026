@@ -19,7 +19,7 @@ function dumbbell_graph(cluster_size::Int)
 end
 
 clusterSize = 3
-regSize = 30
+regSize = 90
 T2 = 100.0
 
 dumbbell = dumbbell_graph(clusterSize) #two clusters of 3 + 2 hubs = 8 nodes
@@ -46,10 +46,23 @@ sim,net = simulation_setup(dumbbell, regSize; T2=T2, endNodes = endNodes)
 flow1 = Flow(src=left_leaves[1], dst=right_leaves[1], npairs=5, uuid=1)
 flow2 = Flow(src=left_leaves[2], dst=right_leaves[2], npairs=5, uuid=2)
 flow3 = Flow(src=left_leaves[3], dst=right_leaves[3], npairs=5, uuid=3)
+flow4 = Flow(src=left_leaves[1], dst=right_leaves[2], npairs=5, uuid=4)
+flow5 = Flow(src=left_leaves[2], dst=right_leaves[3], npairs=5, uuid=5)
+flow6 = Flow(src=left_leaves[3], dst=right_leaves[1], npairs=5, uuid=6)
+flow7 = Flow(src=left_leaves[1], dst=right_leaves[3], npairs=5, uuid=7)
+flow8 = Flow(src=left_leaves[2], dst=right_leaves[1], npairs=5, uuid=8)
+flow9 = Flow(src=left_leaves[3], dst=right_leaves[2], npairs=5, uuid=9)
+
 
 put!(net[left_leaves[1]], flow1)
 put!(net[left_leaves[2]], flow2)
 put!(net[left_leaves[3]], flow3)
+put!(net[left_leaves[1]], flow4)
+put!(net[left_leaves[2]], flow5)
+put!(net[left_leaves[3]], flow6)
+put!(net[left_leaves[1]], flow7)
+put!(net[left_leaves[2]], flow8)
+put!(net[left_leaves[3]], flow9)
 
 #--- Run ---
 using Logging
@@ -83,11 +96,29 @@ flow2_src = count_tags!(mb2, QTCPPairBegin, 2)
 flow2_dst = count_tags!(mb7, QTCPPairEnd,   2)
 flow3_src = count_tags!(mb3, QTCPPairBegin, 3)
 flow3_dst = count_tags!(mb8, QTCPPairEnd,   3)
+flow4_src = count_tags!(mb1, QTCPPairBegin, 4)
+flow4_dst = count_tags!(mb7, QTCPPairEnd,   4)
+flow5_src = count_tags!(mb2, QTCPPairBegin, 5)
+flow5_dst = count_tags!(mb8, QTCPPairEnd,   5)
+flow6_src = count_tags!(mb3, QTCPPairBegin, 6)
+flow6_dst = count_tags!(mb6, QTCPPairEnd,   6)
+flow7_src = count_tags!(mb1, QTCPPairBegin, 7)
+flow7_dst = count_tags!(mb8, QTCPPairEnd,   7)
+flow8_src = count_tags!(mb2, QTCPPairBegin, 8)
+flow8_dst = count_tags!(mb6, QTCPPairEnd,   8)
+flow9_src = count_tags!(mb3, QTCPPairBegin, 9)
+flow9_dst = count_tags!(mb7, QTCPPairEnd,   9)
 
 for(i, src, dst, flow) in[
     (1, flow1_src, flow1_dst, flow1),
     (2, flow2_src, flow2_dst, flow2),
-    (3, flow3_src, flow3_dst, flow3)
+    (3, flow3_src, flow3_dst, flow3),
+    (4, flow4_src, flow4_dst, flow4),
+    (5, flow5_src, flow5_dst, flow5),
+    (6, flow6_src, flow6_dst, flow6),
+    (7, flow7_src, flow7_dst, flow7),
+    (8, flow8_src, flow8_dst, flow8),
+    (9, flow9_src, flow9_dst, flow9)
 ]
     @info "== Flow $i =="
     @info "QTCPPairBegin at src: $src"
