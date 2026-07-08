@@ -39,7 +39,8 @@ right_leaves = collect(clusterSize+3:2*clusterSize+2) #[6, 7, 8]
 # hubs are pure quantum switches -- only leaves are end nodes
 endNodes = vcat(left_leaves,right_leaves)
 
-sim,net = simulation_setup(dumbbell, regSize; T2=T2, endNodes = endNodes)
+sim, net = simulation_setup(dumbbell, regSize;
+    T2=T2, endNodes=endNodes)
 
 #--- Flows ---
 #three flows all crossing the bottleneck simultaneously
@@ -144,3 +145,4 @@ records = let
     end
     recs
 end
+show(stdout, "text/plain", records)

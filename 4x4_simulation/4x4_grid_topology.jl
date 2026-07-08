@@ -6,7 +6,7 @@ numNodes = numRows * numCols #16-node grid
 regSize = 90 #added more slots to handle concurrent flows
 T2 = 100.0
 
-graph = Graphs.grid([numRows, numCols])
+graph = grid([numRows, numCols])
 
 #Set up the simulation with the full QTCP protocol suite
 #End nodes are the four corners of the grid.
