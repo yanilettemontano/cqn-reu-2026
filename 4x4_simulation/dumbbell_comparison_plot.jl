@@ -50,7 +50,7 @@ end
 # --- Plot (a): fidelity over time ---
 p1 = plot(xlabel="Simulation time (s)",
           ylabel="Delivered fidelity F",
-          title="(a) Fidelity over time -- Dumbbell",
+          title="Fidelity over time -- Dumbbell, 9 flows",
           legend=:bottomleft,
           ylims=(0.82, 1.0))
 

@@ -1,6 +1,6 @@
 using QuantumSavory 
 using QuantumSavory.ProtocolZoo
-using Graphs
+using Graphs:grid
 using ResumableFunctions
 using ConcurrentSim
 
