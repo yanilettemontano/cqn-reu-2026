@@ -7,17 +7,18 @@ using ResumableFunctions
 function simulation_setup(
     graph, 
     regSize::Int;
-    T2=100.0,
-    represenation = QuantumOpticsRepr,
-    end_nodes = nothing,
+    T2            = 100.0,
+    representation = CliffordRepr,
+    endNodes     = nothing,
     EndNodeControllerType = EndNodeController,
-    classical_delay = 1e-3
+    classical_delay = 1e-3,
+    use_aimd        = true
 )
 
 registers = Register[]
 for _ in vertices(graph)
     traits = [Qubit() for _ in 1:regsize]
-    repr   = [represenation() for _ in 1:regsize]
+    repr   = [representation() for _ in 1:regsize]
     bg     = [T2Dephasing(T2) for _ in 1:regsize]
     push!(registers, Register(traits, repr, bg))
 end
@@ -25,12 +26,12 @@ end
 net = RegisterNet(graph, registers; classical_delay)
 sim = get_time_tracker(net)
 
-if isnothing(end_nodes)
-    end_nodes = collect(vertices(graph))
+if isnothing(endNodes)
+    endNodes = collect(vertices(graph))
 end
 
-for node in end_nodes
-    ctrl = EndNodeControllerType(net, node)
+for node in endNodes
+    ctrl = EndNodeControllerType(net, node; use_aimd=use_aimd)
     @process ctrl()
 end
 
